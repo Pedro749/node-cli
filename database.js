@@ -1,20 +1,27 @@
-import { readFile, writeFile } from 'fs';
-import { promisify } from 'util';
-const readFileAsync = promisify(readFile);
-const writeFileAsync = promisify(writeFile);
+import { readFileSync, writeFileSync, appendFileSync, unlinkSync, existsSync } from 'fs';
 
 class Database {
-  constructor() {
-    this.NAME_FILE = 'banco.json';
+  constructor(fileName) {
+    this.NAME_FILE = fileName.toString();
+
+    if (existsSync(this.NAME_FILE)) return;
+    appendFileSync(this.NAME_FILE, '[]', (error) => {
+      if (error) throw error;
+    }); 
+   
+  }
+
+  deleteDatabase() {
+    unlinkSync(this.NAME_FILE);
   }
 
   async list() {
-    const file = await readFileAsync(this.NAME_FILE, 'utf8');
+    const file = await readFileSync(this.NAME_FILE, 'utf8');
     return JSON.parse(file.toString());
   }
 
   async write(data) {
-    await writeFileAsync(this.NAME_FILE, JSON.stringify(data));
+    await writeFileSync(this.NAME_FILE, JSON.stringify(data));
     return true;
   }
 
@@ -26,7 +33,7 @@ class Database {
   }
 
   async create(product) {
-    delete product.id;
+    //delete product.id;
     const listProducts = await this.list();
     const id = product.id >= 2 ? product.id : Date.now();
     const productWithId = { id, ...product };
@@ -102,5 +109,5 @@ class Database {
 
 }
 
-export default new Database();
+export default Database;
 

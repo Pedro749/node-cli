@@ -1,11 +1,28 @@
 import { deepEqual } from 'assert';
-import database from './database.js';
+import Database from './Database.js';
+
+const FILE_TEST = 'teste.json';
+const database = new Database(FILE_TEST);
 
 const PRODUCTS_DEFAULT = {
   id: 1,
   name: 'Notebook',
   description: 'light, practical, perfect',
   price: 500000
+};
+
+const PRODUCTS_PRICE_HEIGHER = {
+  id: 10,
+  name: 'Notebook',
+  description: 'light, practical, perfect',
+  price: 5500000
+};
+
+const PRODUCTS_PRICE_LOWER = {
+  id: 9,
+  name: 'Pirulito',
+  description: 'light, practical, perfect',
+  price: 1
 };
 
 const PRODUCT_MOD = {
@@ -22,9 +39,11 @@ const SPEC_MOD = {
 
 
 describe('Testes para manipulação de produtos', () => {
-  before( async () => {
+  before(async () => {
     await database.create(PRODUCTS_DEFAULT);
     await database.create(PRODUCT_MOD);
+    await database.create(PRODUCTS_PRICE_HEIGHER);
+    await database.create(PRODUCTS_PRICE_LOWER);
   });
 
   it('Deve listar um produto do banco', async () => {
@@ -57,14 +76,14 @@ describe('Testes para manipulação de produtos', () => {
   });
 
   it('Deve trazer o produto com o maior price', async () => {
-    const [expected] = await database.listProduct(10);
+    const [expected] = await database.listProduct(PRODUCTS_PRICE_HEIGHER.id);
     const result = await database.price("heigher");
 
     deepEqual(result, expected);
   });
 
   it('Deve trazer o produto com o menor price', async () => {
-    const [expected] = await database.listProduct(9);
+    const [expected] = await database.listProduct(PRODUCTS_PRICE_LOWER.id);
     const result = await database.price("lower");
 
     deepEqual(result, expected);
@@ -76,5 +95,9 @@ describe('Testes para manipulação de produtos', () => {
 
     deepEqual(result, expected);
   });
+
+  after(async () => {
+    database.deleteDatabase();
+  })
   
 })

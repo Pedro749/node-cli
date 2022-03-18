@@ -2,6 +2,9 @@ import { program } from 'Commander';
 import Database from './database.js';
 import Product from './Product.js';
 
+const DATA_BASE_JSON = 'Banco.json';
+const database = new Database(DATA_BASE_JSON);
+
 async function main() {
   program
     .version('v1')
@@ -23,7 +26,7 @@ async function main() {
 
   try {
     if (program._optionValues.create) {
-      const result = await Database.create(product);
+      const result = await database.create(product);
       if(!result) {
         console.error('Produto não cadastrado');
         return;
@@ -31,7 +34,7 @@ async function main() {
       console.log('Produto cadastrado!');
     }
     if (program._optionValues.list) {
-      const result = await Database.list();
+      const result = await database.list();
       console.log(result);
     }
     if (program._optionValues.listProduct) {
@@ -39,11 +42,11 @@ async function main() {
         console.log('Informe o id do produto!');
         return;
       }
-      const result = await Database.listProduct(product.id);
+      const result = await database.listProduct(product.id);
       console.log(result);
     }
     if (program._optionValues.remove) {
-      const result = await Database.remove(product.id);
+      const result = await database.remove(product.id);
       console.log(result);
     }
     if (program._optionValues.alter) {
@@ -51,11 +54,11 @@ async function main() {
         console.log('Informe o id do produto!');
         return;
       }
-      const result = await Database.alter(product.id, product);
+      const result = await database.alter(product.id, product);
       console.log('Produto alterado com sucesso!');
     }
     if (program._optionValues.heigherPrice) {
-      const result = await Database.price('heigher');
+      const result = await database.price('heigher');
       if (!result) {
         console.log('Sem informações sobre preço no banco');
         return;
@@ -63,7 +66,7 @@ async function main() {
       console.log('Produto com maior valor -> ', result);
     }
     if (program._optionValues.lowerPrice) {
-      const result = await Database.price('lower');
+      const result = await database.price('lower');
       if (!result) {
         console.log('Sem informações sobre preço no banco');
         return;
@@ -71,7 +74,7 @@ async function main() {
       console.log('Produto com menor valor ->' , result);
     }
     if (program._optionValues.averagePrice) {
-      const result = await Database.priceAverage();
+      const result = await database.priceAverage();
       if (!result) {
         console.log('Sem informações sobre preço no banco');
         return;
